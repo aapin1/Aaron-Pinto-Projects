@@ -7,15 +7,16 @@ while True:
     ret, frame = vid.read()
     # create a mask
     mask = np.zeros(frame.shape[:2], np.uint8)
-    mask[100:1000, 300:850] = 255
+    mask[20:1050, 800:1500] = 255
 
-    rect = cv2.rectangle(frame, (600,700),(800,1100),(255,80,10),3)
+    rect = cv2.rectangle(frame, (800,50),(1500,1050),(255,80,10),3)
 
     # compute the bitwise AND using the mask
     masked_img = cv2.bitwise_and(frame, frame, mask=mask)
 
     gray = cv2.cvtColor(masked_img, cv2.COLOR_BGR2GRAY)
 
+    #line detection
     edges = cv2.Canny(gray, 50, 150, apertureSize = 3)
 
     lines_list = []
@@ -23,7 +24,7 @@ while True:
 
     for points in lines:
         x1, y1, x2, y2 = points[0]
-        cv2.line(masked_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
         lines_list.append([(x1, y1), (x2, y2)])
 
         #use masked image variable for line detection
