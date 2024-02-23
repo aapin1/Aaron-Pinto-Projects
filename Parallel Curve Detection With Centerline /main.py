@@ -1,4 +1,3 @@
-
 import cv2
 import numpy as np
 
@@ -42,6 +41,11 @@ while True:
     # Draw the rectangle
     cv2.rectangle(frame, (center_x - rect_width // 2, center_y - rect_height // 2),
                   (center_x + rect_width // 2, center_y + rect_height // 2), (255, 80, 10), 3)
+
+    for eachContour in contours:
+        pass
+
+
     cv2.drawContours(frame, contours, -1, (0, 255, 0), 3)
 
     cv2.imshow('Contours', frame)
