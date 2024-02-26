@@ -1,59 +1,80 @@
-import cv2
-import numpy as np
+import cv2  #OpenCV library for image processing
+import numpy as np  #NumPy library for numerical operations
 
-# Initialize video capture
+#Initialize video capture from webcam 
 vid = cv2.VideoCapture(0)
 
+#Loop to keep capturing frames
 while True:
+    #read a frame
     ret, frame = vid.read()
-    if not ret:
-        break  # Exit the loop if frame is None or there's an error
 
-    # Resize frame to fit display window
+    #exit if video ends
+    if not ret:
+        break
+
+    #resize frame
     frame = cv2.resize(frame, (800, 600))
 
+    #extract height and width of frame
     height, width = frame.shape[:2]
 
-    # Center coordinates for the rectangle
+    #get center coords for the rectangle (mask)
     center_x = width // 2
     center_y = height // 2
 
-    # New rectangle size (make it bigger)
+    #rectangle dimensions
     rect_width = 250
     rect_height = 400
 
-    # Create a mask for the rectangle area
+    #create a mask
     mask_rect = np.zeros((height, width), np.uint8)
     mask_rect = cv2.rectangle(mask_rect.copy(), (center_x - rect_width // 2, center_y - rect_height // 2),
                               (center_x + rect_width // 2, center_y + rect_height // 2), 255, -1)
 
-    # Convert frame to grayscale
+    #grayscale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Edge detection
+    #edge detection
     edges = cv2.Canny(gray, 50, 150, apertureSize=3)
 
-    # Apply the mask to include the rectangle area in edge detection
+    #apply the mask to only include areas inside the mask
     edges_inside_rect = cv2.bitwise_and(edges, edges, mask=mask_rect)
 
+    #find contours
     contours, hierarchy = cv2.findContours(edges_inside_rect, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-    # Draw the rectangle
+    #draw the rectangular mask
     cv2.rectangle(frame, (center_x - rect_width // 2, center_y - rect_height // 2),
                   (center_x + rect_width // 2, center_y + rect_height // 2), (255, 80, 10), 3)
 
-    for eachContour in contours:
-        pass
-
-
+    #draw contours on frame
     cv2.drawContours(frame, contours, -1, (0, 255, 0), 3)
 
+    #if there are at least 2 contours
+    if len(contours) >= 2:
+        #get contour points
+        points_contour1 = contours[0][:, 0, :]
+        points_contour2 = contours[1][:, 0, :]
+
+        #calculate the average between the points
+        centerline_points = []
+        for pt1, pt2 in zip(points_contour1, points_contour2):
+            avg_point = ((pt1[0] + pt2[0]) // 2, (pt1[1] + pt2[1]) // 2)
+            centerline_points.append(avg_point)
+
+        #draw the centerline by joining all different points into a line
+        centerline_points = np.array(centerline_points)
+        cv2.polylines(frame, [centerline_points], isClosed=False, color=(0, 0, 255), thickness=2)
+
+
+    #display frame
     cv2.imshow('Contours', frame)
 
-    # Check for key press to exit
+    #check for ESC key
     if cv2.waitKey(1) == 27:
         break
 
-
-
-
+#release & destroy
+vid.release()
+cv2.destroyAllWindows()
