@@ -1,43 +1,57 @@
-# import necessary libraries
-import cv2
-import numpy as np
-from curvedParallelLines import process_frame
+#for when entering the password. hashing will encrypt the password in the sql database
+import hashlib
 
-# Turn on Laptop's webcam
-cap = cv2.VideoCapture("IMG_5199.MOV")
+#for file paths
+import os
 
-while True:
+#imports sqlite3, which will be used to create a sql database
 
-    ret, frame = cap.read()
+#imports all of the required tkinter libraries
+from tkinter import *
+root = Tk()
+from tkinter import ttk
+from tkinter import messagebox
+import tkinter as tk
 
-    # Locate points of the documentsy
-    # or object which you want to transform
-    pts1 = np.float32([[-1050, 960], [-430, 960],
-                       [-1050, 1100], [-430, 1100]])
-    pts2 = np.float32([[-1050, 700], [-650, 700],
-                       [-1050, 1340], [-650, 1340]])
+from datetime import datetime
 
-    # Apply Perspective Transform Algorithm
-    matrix = cv2.getPerspectiveTransform(pts1, pts2)
-    result = cv2.warpPerspective(frame, matrix, (500, 600))
+import sqlpage
 
-    # frame is 1080 by 1920
-    cropped_image = frame[0:900, 0:1920]
+# creates the tk gui
+root.geometry()
+root.geometry("510x1020")
+root.title("Choose")
 
-    #height, width = frame.shape[:2]
-    #print(f"height: {height}")
-    #print(f"width: {width}")
+#function that will open up the sign in page
+def openSignUpPage():
+  root.destroy()
+  time = datetime.now()
+  current_time = time.strftime("%Y-%m-%d %H:%M:%S %Z%z")
+  with open('logText.txt', 'at') as f:
+    f.write("Signup page opened at " + current_time + "\n")
+    f.close()
+  import signup
 
-    # Wrap the transformed image
-    cv2.imshow('frame', cropped_image)  # Initial Capture
-    cv2.imshow('frame1', result)  # Transformed Capture
 
-    processedImage = process_frame(result)
+#function that will open up the log in page
+def openLogInPage():
+  root.destroy()
+  time = datetime.now()
+  current_time = time.strftime("%Y-%m-%d %H:%M:%S %Z%z")
+  with open('logText.txt', 'at') as f:
+    f.write("Login page opened at " + current_time + "\n")
+    f.close()
+  import login
 
-    cv2.imshow('processed',processedImage)
+#creates a login button and sets up their location. The login button runs a function to open up the login screen.
+login_button = Button(root, text="Login", command=openLogInPage)
+login_button.grid(row=0,column=0)
+#creates a signup button and sets up their location. The signup button runs a function to open up the signup screen.
+signup_button = Button(root, text="Create Account", command=openSignUpPage)
+signup_button.grid(row=1,column=0)
+#creates an exit button that will destroy the gui. This will end the program.
+enter_button = Button(root, text="Exit", command=root.destroy)
+enter_button.grid(row=2,column=0)
 
-    if cv2.waitKey(24) == 27:
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+# keeps the gui from disappearing/keeps it on screen
+root.mainloop()
