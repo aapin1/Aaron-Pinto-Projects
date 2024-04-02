@@ -145,13 +145,13 @@ while cap.isOpened():
        # Check if positive slope is detected (indicating a right turn)
        if centerline_slope > 0: 
            positive_slope_count += 1 
-           display_duration = 4 
+           display_duration = 1
            start_time = time.time() 
       
        # Check if negative slope is detected (indicating a left turn)
        elif centerline_slope < -40: 
            negative_slope_count += 1 
-           display_duration = 5 
+           display_duration = 10
            start_time = time.time() 
       
        # Display "Right turn approaching" if count is greater than 75 and the display duration is not expired
@@ -161,6 +161,7 @@ while cap.isOpened():
            if elapsed_time >= display_duration:
                positive_slope_count = 0 
                display_duration = 0 
+               positive_slope_count = -1000
       
        # Display "Left turn approaching" if count is greater than 30 and the display duration is not expired
        elif negative_slope_count > 50 and display_duration > 0:
@@ -179,9 +180,6 @@ while cap.isOpened():
            break
    else:
        break
-
-
+      
 cap.release()
 cv2.destroyAllWindows()
-
-
